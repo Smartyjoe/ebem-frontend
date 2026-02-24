@@ -63,7 +63,7 @@ export function HeroSection() {
   const slide = SLIDES[current];
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: '100dvh', minHeight: 600 }}>
+    <section className="relative w-full overflow-hidden" style={{ height: '100dvh', minHeight: 650 }}>
       {/* Background Images with parallax */}
       {SLIDES.map((s, i) => (
         <div
@@ -82,17 +82,26 @@ export function HeroSection() {
               style={{ transform: 'scale(1.1)', filter: 'brightness(0.5) contrast(1.1) grayscale(0.2)' }}
             />
           </div>
-          {/* Gradient overlay */}
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.1) 100%)' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }} />
         </div>
       ))}
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col justify-end h-full max-w-7xl mx-auto px-6 lg:px-10 pb-16 lg:pb-24">
+      {/* Content Container */}
+      <div 
+        className="relative z-10 flex flex-col justify-between h-full max-w-7xl mx-auto px-6 lg:px-10"
+        style={{ 
+          paddingTop: 'calc(80px + 30px)', // Header height (80px) + your 30px gap
+          paddingBottom: '30px'           // 30px gap from bottom
+        }}
+      >
+        {/* Top/Middle: Main Text and CTA */}
         <div
-          className="transition-all duration-500"
-          style={{ transform: transitioning ? 'translateY(20px)' : 'translateY(0)', opacity: transitioning ? 0 : 1 }}
+          className="transition-all duration-500 mt-auto mb-auto"
+          style={{ 
+            transform: transitioning ? 'translateY(20px)' : 'translateY(0)', 
+            opacity: transitioning ? 0 : 1 
+          }}
         >
           <p className="text-white/60 text-xs uppercase tracking-[0.3em] mb-4" style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}>
             {slide.eyebrow}
@@ -101,9 +110,9 @@ export function HeroSection() {
             className="text-white mb-6 whitespace-pre-line"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(3.5rem, 9vw, 8rem)',
-              lineHeight: 0.92,
-              letterSpacing: '-0.01em',
+              fontSize: 'clamp(3rem, 7.5vw, 6.5rem)', // Scaled down slightly for vertical safety
+              lineHeight: 0.88,
+              letterSpacing: '-0.02em',
             }}
           >
             {slide.headline}
@@ -130,9 +139,8 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Slide Controls */}
-        <div className="flex items-center gap-6 mt-12">
-          {/* Dots */}
+        {/* Bottom: Slide Controls */}
+        <div className="flex items-center gap-6 pt-8">
           <div className="flex items-center gap-2">
             {SLIDES.map((_, i) => (
               <button
@@ -145,32 +153,24 @@ export function HeroSection() {
             ))}
           </div>
 
-          {/* Arrows */}
           <div className="flex items-center gap-2 ml-auto">
-            <button
-              onClick={prev}
-              className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-200"
-            >
+            <button onClick={prev} className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-200">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button
-              onClick={next}
-              className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-200"
-            >
+            <button onClick={next} className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-200">
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Counter */}
           <p className="text-white/40 text-xs" style={{ fontFamily: 'var(--font-body)' }}>
             {String(current + 1).padStart(2, '0')} / {String(SLIDES.length).padStart(2, '0')}
           </p>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-40">
-        <div className="w-px h-10 bg-white animate-pulse" />
+      {/* Scroll indicator - kept separate and absolute */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-30">
+        <div className="w-px h-6 bg-white animate-pulse" />
       </div>
     </section>
   );

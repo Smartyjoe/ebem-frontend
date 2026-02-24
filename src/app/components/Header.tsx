@@ -43,12 +43,11 @@ export function Header() {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
-              <span
-                className={`transition-colors duration-500 ${isDark ? 'text-white' : 'text-black'}`}
-                style={{ fontFamily: 'var(--font-display)', fontSize: '1.7rem', letterSpacing: '0.08em', lineHeight: 1 }}
-              >
-                NEXBRIDGE
-              </span>
+              <img
+                src={isDark ? '/assets/ebem-logo-white.png' : '/assets/Ebem-logo-black.png'}
+                alt="Ebem Global"
+                className="h-8 lg:h-10 w-auto transition-opacity duration-500"
+              />
             </Link>
 
             {/* Desktop Nav */}

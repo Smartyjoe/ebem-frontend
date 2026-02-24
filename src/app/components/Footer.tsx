@@ -29,12 +29,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Column 1 — Brand */}
           <div className="lg:col-span-1">
-            <p
-              className="text-white mb-5"
-              style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', letterSpacing: '0.08em', lineHeight: 1 }}
-            >
-              NEXBRIDGE
-            </p>
+            <img
+              src="/assets/ebem-logo-white.png"
+              alt="Ebem Global"
+              className="h-10 w-auto mb-5"
+            />
             <p className="text-white/50 text-sm leading-relaxed mb-6" style={{ fontFamily: 'var(--font-body)' }}>
               We connect Africa directly to Chinese manufacturers. Factory prices. Zero middlemen. Real trade.
             </p>
