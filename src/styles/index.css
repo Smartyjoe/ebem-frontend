@@ -1,0 +1,23 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+/* Global resets and enhancements */
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Extend Tailwind duration to support 400ms */
+.duration-400 {
+  transition-duration: 400ms;
+}
+
+/* Remove default heading styles for display headings */
+h1, h2, h3 {
+  font-weight: inherit;
+}
