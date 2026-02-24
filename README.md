@@ -17,4 +17,14 @@
 
   API base for frontend defaults to `http://localhost:4000/api/v1`.
   Override with `VITE_API_BASE_URL` in root `.env`.
+
+  ## WordPress Product Request Integration
+
+  Frontend request form submits to WordPress custom REST endpoint:
+  `POST /wp-json/custom/v1/product-request`
+
+  Set `VITE_WP_BASE_URL` in root `.env` (see `.env.example`).
+
+  WordPress plugin and admin endpoint docs:
+  `docs/wordpress-product-requests.md`
   
