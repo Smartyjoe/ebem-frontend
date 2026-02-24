@@ -14,6 +14,8 @@ const schema = z.object({
     .string()
     .optional()
     .transform((value) => value === 'true'),
+  OPENROUTER_API_KEY: z.string().optional(),
+  OPENROUTER_MODEL: z.string().default('openai/gpt-4o-mini'),
 });
 
 const parsed = schema.safeParse(process.env);

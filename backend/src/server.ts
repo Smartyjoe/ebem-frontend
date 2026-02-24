@@ -3,6 +3,7 @@ import express from 'express';
 import helmet from 'helmet';
 import { env } from './env.js';
 import { productsRouter } from './routes/products.js';
+import { aiSearchRouter } from './routes/aiSearch.js';
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.get('/api/v1/health', (_req, res) => {
 });
 
 app.use('/api/v1/products', productsRouter);
+app.use('/api/v1/ai/search', aiSearchRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   const message = err instanceof Error ? err.message : 'Unexpected server error';
