@@ -336,3 +336,5 @@ new EPR_Product_Requests_Plugin();
 require_once __DIR__ . '/inc/cors.php';
 require_once __DIR__ . '/inc/jwt.php';
 require_once __DIR__ . '/inc/auth.php';
+require_once __DIR__ . '/inc/paystack.php';
+require_once __DIR__ . '/inc/settings.php';

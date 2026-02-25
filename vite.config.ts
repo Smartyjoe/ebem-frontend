@@ -19,4 +19,16 @@ export default defineConfig({
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+
+  server: {
+    proxy: {
+      // Proxy /wp-json to WordPress during local dev — avoids CORS for all WP REST calls
+      '/wp-json': {
+        target: 'https://api.ebemglobal.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path,
+      },
+    },
+  },
 })

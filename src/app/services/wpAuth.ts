@@ -58,6 +58,10 @@ async function wpFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
 export interface AuthUser { id: number; email: string; firstName?: string; lastName?: string; displayName?: string }
 
+export function getStoredAccessToken(): string {
+  return readToken();
+}
+
 export const authApi = {
   me: () => wpFetch<AuthUser>('/me', { method: 'GET' }),
   login: async (email: string, password: string) => {

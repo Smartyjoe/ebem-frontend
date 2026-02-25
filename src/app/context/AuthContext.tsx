@@ -1,8 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { authApi, type AuthUser } from '../services/wpAuth';
+import { authApi, getStoredAccessToken, type AuthUser } from '../services/wpAuth';
 
 interface AuthCtx {
   user: AuthUser | null;
+  accessToken: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -16,6 +17,7 @@ const Ctx = createContext<AuthCtx | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(() => getStoredAccessToken() || null);
   const [loading, setLoading] = useState(true);
 
   const refreshMe = useCallback(async () => {
@@ -30,18 +32,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { (async () => { await refreshMe(); setLoading(false); })(); }, [refreshMe]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const { user } = await authApi.login(email, password);
+    const { user, accessToken } = await authApi.login(email, password);
     setUser(user);
+    setAccessToken(accessToken ?? null);
   }, []);
 
   const register = useCallback(async (input: { email: string; password: string; firstName?: string; lastName?: string }) => {
-    const { user } = await authApi.register(input);
+    const { user, accessToken } = await authApi.register(input);
     setUser(user);
+    setAccessToken(accessToken ?? null);
   }, []);
 
   const logout = useCallback(async () => {
     await authApi.logout();
     setUser(null);
+    setAccessToken(null);
   }, []);
 
   const updateProfile = useCallback(async (input: { firstName?: string; lastName?: string; phone?: string }) => {
@@ -51,8 +56,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const requestPassword = useCallback(async (email: string) => { await authApi.requestPassword(email); }, []);
 
-  const value = useMemo(() => ({ user, loading, login, logout, register, refreshMe, updateProfile, requestPassword }),
-    [user, loading, login, logout, register, refreshMe, updateProfile, requestPassword]);
+  const value = useMemo(() => ({ user, accessToken, loading, login, logout, register, refreshMe, updateProfile, requestPassword }),
+    [user, accessToken, loading, login, logout, register, refreshMe, updateProfile, requestPassword]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

@@ -1,115 +1,92 @@
 <?php
-// CORS and preflight handling for custom REST endpoints
+/**
+ * CORS handler for Ebem Global headless endpoints.
+ *
+ * Strategy:
+ *  1. Fire as early as possible via `init` (priority 1) to beat other plugins.
+ *  2. Handle OPTIONS preflight immediately and exit — no WP REST dispatch needed.
+ *  3. Set CORS headers on every REST response via `rest_pre_serve_request`.
+ *  4. Also hook `send_headers` as a safety net for edge cases.
+ */
 
 if (!defined('ABSPATH')) { exit; }
 
-function ebem_cors_allowed_origins(): array {
-    $origins = [
-        'http://localhost:5173',
-        'https://ebemglobal.com',
-        'https://www.ebemglobal.com',
-    ];
+define('EBEM_ALLOWED_ORIGINS', [
+    'http://localhost:5173',
+    'https://ebemglobal.com',
+    'https://www.ebemglobal.com',
+]);
 
-    /**
-     * Filter allowed origins for custom REST CORS.
-     *
-     * Example:
-     * add_filter('ebem_custom_cors_allowed_origins', function($origins) {
-     *   $origins[] = 'https://staging.ebemglobal.com';
-     *   return $origins;
-     * });
-     */
-    $origins = apply_filters('ebem_custom_cors_allowed_origins', $origins);
-    if (!is_array($origins)) {
-        return [];
+/**
+ * Emit the correct CORS headers for the current request origin.
+ * Safe to call multiple times — uses a static flag to avoid duplicate headers.
+ */
+function ebem_send_cors_headers(): void {
+    static $sent = false;
+    if ($sent) { return; }
+
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+    // Only set for allowed origins
+    if (!in_array($origin, EBEM_ALLOWED_ORIGINS, true)) {
+        return;
     }
 
-    // Normalize and deduplicate to avoid mismatch due to whitespace/trailing slash.
-    $normalized = [];
-    foreach ($origins as $origin) {
-        if (!is_string($origin)) { continue; }
-        $trimmed = rtrim(trim($origin), '/');
-        if ($trimmed !== '') {
-            $normalized[] = $trimmed;
-        }
-    }
+    // Prevent header injection
+    $safe_origin = esc_url_raw($origin);
 
-    return array_values(array_unique($normalized));
-}
-
-function ebem_origin_allowed(string $origin, array $allowed): bool {
-    if ($origin === '') {
-        return false;
-    }
-
-    if (in_array($origin, $allowed, true)) {
-        return true;
-    }
-
-    // Allow first-party subdomains such as www/staging/preview under ebemglobal.com.
-    if (preg_match('#^https://([a-z0-9-]+\.)*ebemglobal\.com$#i', $origin) === 1) {
-        return true;
-    }
-
-    return false;
-}
-
-function ebem_send_cors_headers() {
-    if (!function_exists('getallheaders')) {
-        // Fallback for some environments
-        $request_headers = [];
-        foreach ($_SERVER as $key => $value) {
-            if (strpos($key, 'HTTP_') === 0) {
-                $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))));
-                $request_headers[$name] = $value;
-            }
-        }
-    } else {
-        $request_headers = getallheaders();
-    }
-
-    $origin = '';
-    foreach ($request_headers as $key => $value) {
-        if (strtolower((string) $key) === 'origin') {
-            $origin = is_string($value) ? rtrim(trim($value), '/') : '';
-            break;
-        }
-    }
-    if (!$origin) { return; }
-
-    $allowed = ebem_cors_allowed_origins();
-    if (ebem_origin_allowed($origin, $allowed)) {
-        header('Access-Control-Allow-Origin: ' . $origin);
-        header('Vary: Origin');
+    if (!headers_sent()) {
+        header('Access-Control-Allow-Origin: ' . $safe_origin);
         header('Access-Control-Allow-Credentials: true');
-        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
         header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-WP-Nonce');
+        header('Access-Control-Max-Age: 600');
+        header('Vary: Origin');
     }
+
+    $sent = true;
 }
 
-// Hook into REST API init to add CORS for our namespace only
-add_action('rest_api_init', function() {
-    // Preload CORS headers early for all custom endpoints
-    add_action('rest_pre_serve_request', function($value, $server, $request) {
-        // Only apply on our custom namespace
-        if (is_a($request, 'WP_REST_Request')) {
-            $route = $request->get_route();
-            if (strpos($route, '/custom/v1/') === 0) {
-                ebem_send_cors_headers();
-            }
+/**
+ * Is this request targeting our custom namespace?
+ */
+function ebem_is_custom_route(): bool {
+    $uri = $_SERVER['REQUEST_URI'] ?? '';
+    return strpos($uri, '/wp-json/custom/v1/') !== false;
+}
+
+// ── 1. Earliest possible hook — fires before most plugins ────────────────────
+add_action('init', function () {
+    if (!ebem_is_custom_route()) { return; }
+
+    ebem_send_cors_headers();
+
+    // Handle preflight OPTIONS — respond immediately, no further WP processing
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        if (!headers_sent()) {
+            header('HTTP/1.1 204 No Content');
+            header('Content-Length: 0');
         }
+        exit;
+    }
+}, 1); // Priority 1 = very early
+
+// ── 2. REST API hook — ensures headers are on every REST response ─────────────
+add_action('rest_api_init', function () {
+    // Remove WP core's own CORS handling so it doesn't conflict
+    remove_filter('rest_pre_serve_request', 'rest_send_cors_headers');
+
+    add_filter('rest_pre_serve_request', function ($value, $server, $request) {
+        if (!$request instanceof WP_REST_Request) { return $value; }
+        if (strpos($request->get_route(), '/custom/v1/') !== 0) { return $value; }
+
+        ebem_send_cors_headers();
         return $value;
     }, 10, 3);
-});
+}, 15);
 
-// Handle OPTIONS preflight early
-add_action('init', function() {
-    if ('OPTIONS' === $_SERVER['REQUEST_METHOD']) {
-        $request_uri = $_SERVER['REQUEST_URI'] ?? '';
-        if (strpos($request_uri, '/wp-json/custom/v1/') !== false) {
-            ebem_send_cors_headers();
-            status_header(200);
-            exit;
-        }
-    }
+// ── 3. Safety net — send_headers fires just before WP outputs anything ────────
+add_action('send_headers', function () {
+    if (!ebem_is_custom_route()) { return; }
+    ebem_send_cors_headers();
 });
