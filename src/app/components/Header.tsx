@@ -3,8 +3,6 @@ import { Link, useLocation } from 'react-router';
 import { ShoppingBag, Search, Package, Menu, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ProfileButton } from './ProfileButton';
-import { useAuth } from '../../app/context/AuthContext';
-import { Link } from 'react-router';
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
@@ -154,10 +152,18 @@ export function Header() {
               </Link>
             ))}
           </nav>
-          <div className="mt-8 flex gap-3">
+          <div className="mt-8 grid grid-cols-2 gap-3">
+            <Link
+              to="/account"
+              onClick={() => setMobileOpen(false)}
+              className="py-3 border text-center rounded-full text-xs uppercase tracking-widest hover:bg-gray-100"
+              style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+            >
+              Account
+            </Link>
             <button
               onClick={() => { openPanel('request'); setMobileOpen(false); }}
-              className="flex-1 py-3 bg-black text-white text-xs uppercase tracking-widest rounded-full"
+              className="py-3 bg-black text-white text-xs uppercase tracking-widest rounded-full"
               style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
             >
               Request Product
