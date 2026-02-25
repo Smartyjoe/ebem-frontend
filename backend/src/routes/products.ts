@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { mapWooProduct, type WooProductInput } from '../services/productMapper.js';
-import { fetchWooProducts } from '../services/woo.js';
+import { fetchWooProductByReference, fetchWooProducts } from '../services/woo.js';
 import type { ProductsResponse } from '../types.js';
 
 const querySchema = z.object({
@@ -61,6 +61,23 @@ productsRouter.get('/featured', async (req, res, next) => {
 
     const products = rawProducts.map((product) => mapWooProduct(product as WooProductInput));
     res.json({ items: products.slice(0, perPage) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+productsRouter.get('/:reference', async (req, res, next) => {
+  try {
+    const reference = z.string().trim().min(1).parse(req.params.reference);
+    const rawProduct = await fetchWooProductByReference(reference);
+
+    if (!rawProduct) {
+      res.status(404).json({ error: 'Product not found' });
+      return;
+    }
+
+    const product = mapWooProduct(rawProduct as WooProductInput);
+    res.json(product);
   } catch (error) {
     next(error);
   }

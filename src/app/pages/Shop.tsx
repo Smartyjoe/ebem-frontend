@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Grid3X3, List } from 'lucide-react';
+import { Link } from 'react-router';
 import { useApp } from '../context/AppContext';
 import { getProducts } from '../services/products';
 import type { Product } from '../types/product';
@@ -102,47 +103,53 @@ export default function Shop() {
         <div className={`grid gap-6 ${view === 'grid' ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'}`}>
           {filtered.map((product) => (
             <div key={product.id} className={`group ${view === 'list' ? 'flex gap-6 border-b border-gray-100 pb-6' : ''}`}>
-              <div
-                className={`relative overflow-hidden bg-gray-50 ${view === 'list' ? 'w-32 h-32 flex-shrink-0' : 'mb-4'}`}
-                style={view === 'grid' ? { aspectRatio: '4/5' } : {}}
-              >
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute top-2 left-2 flex flex-col gap-1">
-                  <span
-                    className={`px-2 py-0.5 text-xs uppercase tracking-wide ${
-                      product.badge === 'Pre-Order' ? 'bg-black text-white' : 'bg-white text-black'
-                    }`}
-                    style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
-                  >
-                    {product.badge}
-                  </span>
-                </div>
-                {view === 'grid' && (
-                  <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                    <button
-                      onClick={() => {
-                        addToCart({ id: product.id, name: product.name, price: product.price, image: product.image, badge: product.badge });
-                        openPanel('cart');
-                      }}
-                      className="w-full py-2.5 bg-black text-white text-xs uppercase tracking-widest hover:bg-gray-800 transition-colors"
+              <Link to={`/shop/${product.slug}`} className={view === 'list' ? 'block flex-shrink-0' : 'block'}>
+                <div
+                  className={`relative overflow-hidden bg-gray-50 ${view === 'list' ? 'w-32 h-32 flex-shrink-0' : 'mb-4'}`}
+                  style={view === 'grid' ? { aspectRatio: '4/5' } : {}}
+                >
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute top-2 left-2 flex flex-col gap-1">
+                    <span
+                      className={`px-2 py-0.5 text-xs uppercase tracking-wide ${
+                        product.badge === 'Pre-Order' ? 'bg-black text-white' : 'bg-white text-black'
+                      }`}
                       style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
                     >
-                      Add to Cart
-                    </button>
+                      {product.badge}
+                    </span>
                   </div>
-                )}
-              </div>
+                  {view === 'grid' && (
+                    <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                      <button
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          addToCart({ id: product.id, name: product.name, price: product.price, image: product.image, badge: product.badge });
+                          openPanel('cart');
+                        }}
+                        className="w-full py-2.5 bg-black text-white text-xs uppercase tracking-widest hover:bg-gray-800 transition-colors"
+                        style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </Link>
               <div className={view === 'list' ? 'flex-1 flex flex-col justify-center' : ''}>
                 <p className="text-gray-400 text-xs uppercase tracking-widest mb-0.5" style={{ fontFamily: 'var(--font-body)' }}>
                   {product.category}
                 </p>
-                <h3 className="text-gray-900 mb-1" style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: '0.9rem' }}>
-                  {product.name}
-                </h3>
+                <Link to={`/shop/${product.slug}`} className="inline-block">
+                  <h3 className="text-gray-900 mb-1 hover:text-gray-600 transition-colors" style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: '0.9rem' }}>
+                    {product.name}
+                  </h3>
+                </Link>
                 <div className="flex items-center gap-2 mb-3">
                   <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem' }}>{formatNaira(product.price)}</span>
                   {product.originalPrice && <span className="text-gray-400 text-sm line-through">{formatNaira(product.originalPrice)}</span>}

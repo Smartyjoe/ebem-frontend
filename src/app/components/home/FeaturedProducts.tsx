@@ -25,66 +25,72 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
         transitionDelay: `${index * 70}ms`,
       }}
     >
-      <div className="relative overflow-hidden bg-gray-50 mb-4" style={{ aspectRatio: '4/5' }}>
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+      <Link to={`/shop/${product.slug}`} className="block">
+        <div className="relative overflow-hidden bg-gray-50 mb-4" style={{ aspectRatio: '4/5' }}>
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
 
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-          <span
-            className={`px-2.5 py-1 text-xs uppercase tracking-wider ${
-              product.badge === 'Pre-Order' ? 'bg-black text-white' : 'bg-white text-black'
-            }`}
-            style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
-          >
-            {product.badge}
-          </span>
-          {product.hot && (
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             <span
-              className="px-2.5 py-1 text-xs uppercase tracking-wider bg-gray-800 text-white"
+              className={`px-2.5 py-1 text-xs uppercase tracking-wider ${
+                product.badge === 'Pre-Order' ? 'bg-black text-white' : 'bg-white text-black'
+              }`}
               style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
             >
-              Hot
+              {product.badge}
             </span>
-          )}
-        </div>
+            {product.hot && (
+              <span
+                className="px-2.5 py-1 text-xs uppercase tracking-wider bg-gray-800 text-white"
+                style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+              >
+                Hot
+              </span>
+            )}
+          </div>
 
-        <div
-          className="absolute inset-x-0 bottom-0 p-4 transition-all duration-300"
-          style={{ transform: hovered ? 'translateY(0)' : 'translateY(100%)', opacity: hovered ? 1 : 0 }}
-        >
-          <button
-            onClick={() => {
-              addToCart({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                image: product.image,
-                badge: product.badge,
-              });
-              openPanel('cart');
-            }}
-            className="w-full py-3 bg-black text-white text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors"
-            style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+          <div
+            className="absolute inset-x-0 bottom-0 p-4 transition-all duration-300"
+            style={{ transform: hovered ? 'translateY(0)' : 'translateY(100%)', opacity: hovered ? 1 : 0 }}
           >
-            <ShoppingBag className="w-4 h-4" />
-            Add to Cart
-          </button>
+            <button
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                addToCart({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.image,
+                  badge: product.badge,
+                });
+                openPanel('cart');
+              }}
+              className="w-full py-3 bg-black text-white text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors"
+              style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+            >
+              <ShoppingBag className="w-4 h-4" />
+              Add to Cart
+            </button>
+          </div>
         </div>
-      </div>
+      </Link>
 
       <div>
         <p className="text-gray-400 text-xs uppercase tracking-widest mb-0.5" style={{ fontFamily: 'var(--font-body)' }}>
           {product.category}
         </p>
-        <h3
-          className="text-gray-900 mb-1 group-hover:text-gray-600 transition-colors"
-          style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: '0.9rem' }}
-        >
-          {product.name}
-        </h3>
+        <Link to={`/shop/${product.slug}`} className="inline-block">
+          <h3
+            className="text-gray-900 mb-1 group-hover:text-gray-600 transition-colors"
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: '0.9rem' }}
+          >
+            {product.name}
+          </h3>
+        </Link>
         <div className="flex items-center gap-2">
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem' }}>{formatNaira(product.price)}</span>
           {product.originalPrice && (

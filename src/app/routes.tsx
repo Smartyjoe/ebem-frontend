@@ -6,6 +6,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Blog from './pages/Blog';
 import NotFound from './pages/NotFound';
+import ProductDetails from './pages/ProductDetails';
 
 export const router = createBrowserRouter([
   {
@@ -14,6 +15,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Home },
       { path: 'shop', Component: Shop },
+      { path: 'shop/:reference', Component: ProductDetails },
       { path: 'about', Component: About },
       { path: 'contact', Component: Contact },
       { path: 'blog', Component: Blog },

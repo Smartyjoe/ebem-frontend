@@ -21,6 +21,10 @@ export function getProducts(args: GetProductsArgs = {}) {
   return apiGet<ProductsResponse>(`/products${buildQuery(args)}`);
 }
 
+export function getProductByReference(reference: string) {
+  return apiGet<Product>(`/products/${encodeURIComponent(reference)}`);
+}
+
 export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
   const data = await apiGet<{ items: Product[] }>(`/products/featured?limit=${limit}`);
   return data.items;
