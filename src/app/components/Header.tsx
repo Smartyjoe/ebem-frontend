@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import { ShoppingBag, Search, Package, Menu, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { ProfileButton } from './ProfileButton';
+import { useAuth } from '../../app/context/AuthContext';
+import { Link } from 'react-router';
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
@@ -70,6 +73,8 @@ export function Header() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-1 lg:gap-2">
+              {/* Profile */}
+              <ProfileButton />
               {/* AI Search */}
               <button
                 onClick={() => openPanel('search')}

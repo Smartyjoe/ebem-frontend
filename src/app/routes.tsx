@@ -6,6 +6,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Blog from './pages/Blog';
 import NotFound from './pages/NotFound';
+import Account from './pages/Account';
 import ProductDetails from './pages/ProductDetails';
 import Checkout from './pages/Checkout';
 import Payment from './pages/Payment';
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
       { path: 'contact', Component: Contact },
       { path: 'blog', Component: Blog },
       { path: 'blog/:slug', Component: Blog },
+      { path: 'account', Component: Account },
       { path: 'checkout', Component: Checkout },
       { path: 'payment', Component: Payment },
       { path: '*', Component: NotFound },

@@ -1,5 +1,9 @@
 <?php
 /**
+ * Plugin Name: Ebem Product Requests & Auth
+ * Description: Custom endpoints for product requests, headless auth, and Paystack gateway support.
+ */
+/**
  * Plugin Name: EBEM Product Requests API
  * Description: Captures storefront product requests and exposes admin REST endpoints.
  * Version: 1.0.0
@@ -325,4 +329,10 @@ final class EPR_Product_Requests_Plugin {
     }
 }
 
+// Bootstrap existing product requests plugin
 new EPR_Product_Requests_Plugin();
+
+// Load Ebem headless modules
+require_once __DIR__ . '/inc/cors.php';
+require_once __DIR__ . '/inc/jwt.php';
+require_once __DIR__ . '/inc/auth.php';
