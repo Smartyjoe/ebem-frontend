@@ -1,4 +1,5 @@
 import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
+import { Link } from 'react-router';
 import { useApp } from '../../context/AppContext';
 
 export function CartPanel() {
@@ -116,9 +117,14 @@ export function CartPanel() {
               </span>
             </div>
             <p className="text-gray-400 text-xs mb-4">Shipping and taxes calculated at checkout</p>
-            <button className="w-full py-4 bg-black text-white text-sm uppercase tracking-widest rounded-xl hover:scale-[1.02] hover:shadow-xl transition-all duration-200">
+            <Link
+              to="/checkout"
+              onClick={closePanel}
+              className="block w-full py-4 bg-black text-white text-sm uppercase tracking-widest rounded-xl hover:scale-[1.02] hover:shadow-xl transition-all duration-200 text-center"
+              style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+            >
               Proceed to Checkout
-            </button>
+            </Link>
           </div>
         )}
       </div>

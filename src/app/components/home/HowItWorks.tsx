@@ -3,8 +3,8 @@ import { useScrollReveal } from '../../hooks/useScrollReveal';
 const STEPS = [
   {
     number: '01',
-    title: 'Choose Product',
-    desc: 'Browse our ready stock or request any product from China. Tell us exactly what you need.',
+    title: 'Browse or Request',
+    desc: 'Shop our Nigeria ready stock or submit a product request. Use our AI search to find exactly what you need from China.',
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
         <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -13,8 +13,8 @@ const STEPS = [
   },
   {
     number: '02',
-    title: 'We Source from China',
-    desc: 'Our team contacts verified manufacturers, negotiates the best factory price, and arranges production or shipment.',
+    title: 'We Source & Negotiate',
+    desc: 'Our China Market Division contacts verified factories, negotiates the best price, manages MOQs, and arranges production or shipment.',
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
         <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><polyline points="9 22 9 12 15 12 15 22" />
@@ -23,8 +23,8 @@ const STEPS = [
   },
   {
     number: '03',
-    title: 'Fast Delivery to Nigeria',
-    desc: 'Products are shipped via our logistics network, cleared through customs, and warehoused in Lagos.',
+    title: 'Logistics & Customs',
+    desc: 'Products are shipped via our sea or air cargo network, inspected for quality, and cleared through Nigerian customs — stress-free.',
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
         <rect x="1" y="3" width="15" height="13" rx="1" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
@@ -34,7 +34,7 @@ const STEPS = [
   {
     number: '04',
     title: 'Delivered to You',
-    desc: 'Your order is delivered to your doorstep or business address anywhere in Nigeria.',
+    desc: 'Your order arrives at your doorstep or business address anywhere in Nigeria. Fast, tracked, and reliable.',
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
         <path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />

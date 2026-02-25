@@ -30,16 +30,7 @@ const AppContext = createContext<AppContextType | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activePanel, setActivePanel] = useState<PanelType>(null);
   const [prefillRequest, setPrefillRequest] = useState('');
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: '1',
-      name: 'Pro Smartwatch X1',
-      price: 45000,
-      image: 'https://images.unsplash.com/photo-1616640044918-0622649122f0?w=400&q=80',
-      quantity: 1,
-      badge: 'Ready Stock',
-    },
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   const openPanel = useCallback((panel: PanelType) => setActivePanel(panel), []);
   const closePanel = useCallback(() => setActivePanel(null), []);

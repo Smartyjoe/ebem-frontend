@@ -13,9 +13,11 @@ const QUICK_LINKS = [
 const SERVICES = [
   'Nigeria Ready Stock',
   'China Pre-Order',
-  'Bulk Sourcing',
+  'Bulk & Wholesale Sourcing',
   'Manufacturer Pricing',
-  'Product Sourcing',
+  'Logistics & Customs',
+  'Dropshipping Support',
+  'AI Product Search',
   'Trade Consulting',
 ];
 
@@ -120,19 +122,19 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-white/40 mt-0.5 flex-shrink-0" />
                 <span className="text-white/60 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
-                  Victoria Island, Lagos<br />Nigeria
+                  Nigeria (Head Office)<br />China Operations Active
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-white/40 flex-shrink-0" />
-                <a href="tel:+2348000000000" className="text-white/60 hover:text-white text-sm transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
-                  +234 800 000 0000
+                <a href="tel:+2348154561953" className="text-white/60 hover:text-white text-sm transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
+                  +234 815 456 1953
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-white/40 flex-shrink-0" />
-                <a href="mailto:hello@nexbridge.com" className="text-white/60 hover:text-white text-sm transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
-                  hello@nexbridge.com
+                <a href="mailto:Ebemglobal@gmail.com" className="text-white/60 hover:text-white text-sm transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
+                  Ebemglobal@gmail.com
                 </a>
               </li>
             </ul>
@@ -165,7 +167,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-white/30 text-xs" style={{ fontFamily: 'var(--font-body)' }}>
-            © 2026 NEXBRIDGE. All Rights Reserved. China to Africa Supply.
+            © 2026 Ebem Global. All Rights Reserved. Making Global Trade Easy, Direct, and Profitable.
           </p>
           <div className="flex items-center gap-6">
             {['Privacy Policy', 'Terms of Service', 'Shipping Policy'].map(item => (

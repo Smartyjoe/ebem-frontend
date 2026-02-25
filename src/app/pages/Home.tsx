@@ -34,7 +34,7 @@ function RequestCTA() {
           className="text-gray-500 text-sm lg:text-base leading-relaxed mb-10 max-w-xl mx-auto"
           style={{ fontFamily: 'var(--font-body)' }}
         >
-          Can't find what you need? Our sourcing team will locate it, negotiate factory pricing, and ship it directly to Nigeria for you.
+          Can't find what you need? Ebem Global's sourcing team will locate it, negotiate factory pricing directly with verified Chinese manufacturers, and ship it to your door in Nigeria.
         </p>
         <button
           onClick={() => openPanel('request')}

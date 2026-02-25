@@ -27,13 +27,13 @@ export default function Contact() {
           {/* Left */}
           <div>
             <p className="text-gray-500 text-sm leading-relaxed mb-10" style={{ fontFamily: 'var(--font-body)' }}>
-              Whether you're looking to source products, discuss bulk orders, or learn more about our services — our team is ready to assist you within 24 hours.
+              Whether you're looking to source products from China, discuss bulk orders, explore dropshipping, or learn more about our trade services — our team is ready to assist you within 24 hours.
             </p>
             <div className="space-y-6">
               {[
-                { Icon: MapPin, label: 'Our Office', value: 'Victoria Island, Lagos, Nigeria' },
-                { Icon: Phone, label: 'Phone', value: '+234 800 000 0000' },
-                { Icon: Mail, label: 'Email', value: 'hello@nexbridge.com' },
+                { Icon: MapPin, label: 'Our Office', value: 'Nigeria (Head Office)' },
+                { Icon: Phone, label: 'Phone', value: '+234 815 456 1953' },
+                { Icon: Mail, label: 'Email', value: 'Ebemglobal@gmail.com' },
               ].map(({ Icon, label, value }) => (
                 <div key={label} className="flex items-start gap-4">
                   <div className="w-10 h-10 border border-gray-200 flex items-center justify-center flex-shrink-0">
@@ -50,7 +50,8 @@ export default function Contact() {
             <div className="mt-12 p-6 bg-gray-50 border border-gray-100">
               <p className="text-xs uppercase tracking-widest text-gray-400 mb-2" style={{ fontFamily: 'var(--font-body)' }}>Business Hours</p>
               <p className="text-sm text-gray-600" style={{ fontFamily: 'var(--font-body)' }}>Monday – Friday: 9:00 AM – 6:00 PM WAT</p>
-              <p className="text-sm text-gray-600" style={{ fontFamily: 'var(--font-body)' }}>Saturday: 10:00 AM – 2:00 PM WAT</p>
+              <p className="text-sm text-gray-600" style={{ fontFamily: 'var(--font-body)' }}>Saturday: 10:00 AM – 3:00 PM WAT</p>
+              <p className="text-sm text-gray-400 mt-2" style={{ fontFamily: 'var(--font-body)' }}>WhatsApp available for trade enquiries</p>
             </div>
           </div>
 

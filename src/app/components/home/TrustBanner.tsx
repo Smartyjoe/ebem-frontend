@@ -17,6 +17,14 @@ const MARQUEE_ITEMS = [
   '·',
   'Zero Middlemen',
   '·',
+  'RMB Exchange',
+  '·',
+  'Dropshipping Support',
+  '·',
+  'AI-Powered Search',
+  '·',
+  'Logistics Coordination',
+  '·',
 ];
 
 export function TrustBanner() {

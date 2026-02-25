@@ -8,43 +8,7 @@ const BENEFITS = [
       </svg>
     ),
     title: 'Manufacturer Pricing',
-    desc: 'We source directly from verified Chinese factories. No middlemen. No inflated margins. Pure factory cost.',
-  },
-  {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" />
-      </svg>
-    ),
-    title: 'Nigeria Ready Stock',
-    desc: 'Hundreds of products available in Lagos for immediate delivery across Nigeria. No waiting times.',
-  },
-  {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="1" y="3" width="15" height="13" rx="1" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
-      </svg>
-    ),
-    title: 'China Pre-Order Access',
-    desc: 'Order any product from China before it reaches local markets. We handle sourcing, shipping, and customs.',
-  },
-  {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" />
-      </svg>
-    ),
-    title: 'Bulk Order Support',
-    desc: 'Dedicated support for retailers, businesses, and distributors. Volume discounts and consolidated shipping.',
-  },
-  {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="1" y="4" width="22" height="16" rx="2" /><line x1="1" y1="10" x2="23" y2="10" />
-      </svg>
-    ),
-    title: 'Secure Payments',
-    desc: 'Multiple payment options including bank transfer, card, and escrow for bulk orders. Every transaction protected.',
+    desc: 'We source directly from verified Chinese factories. No middlemen. No inflated margins. Pure factory cost passed on to you.',
   },
   {
     icon: (
@@ -52,8 +16,44 @@ const BENEFITS = [
         <path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
       </svg>
     ),
-    title: 'Verified Suppliers',
-    desc: 'Every supplier is vetted for quality, reliability, and compliance. We only work with factories we trust.',
+    title: 'Verified Suppliers Only',
+    desc: 'Every supplier undergoes Ebem Global\'s verification process — factory checks, quality audits, and compliance reviews before we work with them.',
+  },
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="1" y="3" width="15" height="13" rx="1" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
+      </svg>
+    ),
+    title: 'End-to-End Support',
+    desc: 'From sourcing to delivery — we handle manufacturer communication, price negotiation, logistics, customs, and last-mile delivery in Nigeria.',
+  },
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" />
+      </svg>
+    ),
+    title: 'Bulk & Wholesale Supply',
+    desc: 'Dedicated support for retailers, wholesalers, and distributors. Volume discounts, MOQ structuring, and consolidated container shipping.',
+  },
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+    ),
+    title: 'AI-Powered Sourcing',
+    desc: 'Our AI tools help you find the right products faster — from intelligent search to image-based product lookup from China market catalogues.',
+  },
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" />
+      </svg>
+    ),
+    title: 'China–Africa Specialisation',
+    desc: 'We are not a generic global marketplace. We are built specifically for the China–Africa trade corridor, with on-ground partners in both regions.',
   },
 ];
 
@@ -126,7 +126,7 @@ export function WhyChooseUs() {
               Why Buy<br />Through Us?
             </h2>
             <p className="text-stone-600 text-sm leading-relaxed mb-9 max-w-sm" style={{ fontFamily: 'var(--font-body)' }}>
-              We are not a marketplace. We are a direct supply channel between Chinese manufacturers and African buyers, cutting costs, eliminating middlemen, and delivering real value.
+              Ebem Global is not a generic marketplace. We are a structured trade partner built specifically for the China–Africa corridor — cutting costs, eliminating middlemen, and delivering real value to African businesses.
             </p>
             <div className="flex gap-7 md:gap-8 pt-6 border-t border-stone-300/80">
               {[
