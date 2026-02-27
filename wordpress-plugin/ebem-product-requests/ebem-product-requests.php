@@ -16,6 +16,7 @@ if (!defined('ABSPATH')) {
 
 final class EPR_Product_Requests_Plugin {
     const POST_TYPE = 'product_request';
+    const CONTACT_POST_TYPE = 'contact_submission';
     const REST_NAMESPACE = 'custom/v1';
     const MAX_FILE_SIZE_BYTES = 15728640; // 15 MB
     const RATE_LIMIT_WINDOW = 600; // 10 minutes
@@ -33,6 +34,22 @@ final class EPR_Product_Requests_Plugin {
                 'labels' => array(
                     'name' => 'Product Requests',
                     'singular_name' => 'Product Request',
+                ),
+                'public' => false,
+                'show_ui' => true,
+                'show_in_rest' => false,
+                'supports' => array('title'),
+                'capability_type' => 'post',
+                'map_meta_cap' => true,
+            )
+        );
+
+        register_post_type(
+            self::CONTACT_POST_TYPE,
+            array(
+                'labels' => array(
+                    'name' => 'Contact Submissions',
+                    'singular_name' => 'Contact Submission',
                 ),
                 'public' => false,
                 'show_ui' => true,
@@ -93,6 +110,59 @@ final class EPR_Product_Requests_Plugin {
                 array(
                     'methods' => WP_REST_Server::EDITABLE,
                     'callback' => array($this, 'update_product_request'),
+                    'permission_callback' => array($this, 'admin_permission'),
+                ),
+            )
+        );
+
+        register_rest_route(
+            self::REST_NAMESPACE,
+            '/contact-submission',
+            array(
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => array($this, 'create_contact_submission'),
+                'permission_callback' => '__return_true',
+            )
+        );
+
+        register_rest_route(
+            self::REST_NAMESPACE,
+            '/contact-submissions',
+            array(
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => array($this, 'list_contact_submissions'),
+                'permission_callback' => array($this, 'admin_permission'),
+                'args' => array(
+                    'page' => array(
+                        'default' => 1,
+                        'sanitize_callback' => 'absint',
+                    ),
+                    'per_page' => array(
+                        'default' => 20,
+                        'sanitize_callback' => 'absint',
+                    ),
+                    'status' => array(
+                        'sanitize_callback' => 'sanitize_text_field',
+                    ),
+                    'search' => array(
+                        'sanitize_callback' => 'sanitize_text_field',
+                    ),
+                ),
+            )
+        );
+
+        register_rest_route(
+            self::REST_NAMESPACE,
+            '/contact-submissions/(?P<id>\d+)',
+            array(
+                array(
+                    'methods' => WP_REST_Server::READABLE,
+                    'callback' => array($this, 'get_contact_submission'),
+                    'permission_callback' => array($this, 'admin_permission'),
+                ),
+                array(
+                    'methods' => WP_REST_Server::EDITABLE,
+                    'callback' => array($this, 'update_contact_submission'),
                     'permission_callback' => array($this, 'admin_permission'),
                 ),
             )
@@ -182,6 +252,20 @@ final class EPR_Product_Requests_Plugin {
             'admin_response' => get_post_meta($post_id, 'admin_response', true),
             'media_id' => $attachment_id ?: null,
             'media_url' => $attachment_id ? wp_get_attachment_url($attachment_id) : null,
+            'created_at' => get_post_field('post_date_gmt', $post_id),
+            'updated_at' => get_post_field('post_modified_gmt', $post_id),
+        );
+    }
+
+    private function map_contact_post($post_id) {
+        return array(
+            'id' => (int) $post_id,
+            'name' => get_post_meta($post_id, 'name', true),
+            'email' => get_post_meta($post_id, 'email', true),
+            'subject' => get_post_meta($post_id, 'subject', true),
+            'message' => get_post_meta($post_id, 'message', true),
+            'status' => get_post_meta($post_id, 'status', true) ?: 'new',
+            'admin_note' => get_post_meta($post_id, 'admin_note', true),
             'created_at' => get_post_field('post_date_gmt', $post_id),
             'updated_at' => get_post_field('post_modified_gmt', $post_id),
         );
@@ -326,6 +410,126 @@ final class EPR_Product_Requests_Plugin {
         }
 
         return new WP_REST_Response($this->map_request_post($id), 200);
+    }
+
+    public function create_contact_submission(WP_REST_Request $request) {
+        $rate = $this->enforce_rate_limit();
+        if (is_wp_error($rate)) {
+            return $rate;
+        }
+
+        $name = sanitize_text_field((string) $request->get_param('name'));
+        $email = sanitize_email((string) $request->get_param('email'));
+        $subject = sanitize_text_field((string) $request->get_param('subject'));
+        $message = sanitize_textarea_field((string) $request->get_param('message'));
+
+        if ($name === '' || !is_email($email) || $subject === '' || $message === '') {
+            return new WP_Error('invalid_input', 'Missing or invalid contact fields.', array('status' => 400));
+        }
+
+        $post_id = wp_insert_post(
+            array(
+                'post_type' => self::CONTACT_POST_TYPE,
+                'post_status' => 'publish',
+                'post_title' => $subject,
+            ),
+            true
+        );
+
+        if (is_wp_error($post_id)) {
+            return new WP_Error('contact_create_failed', 'Unable to submit contact message.', array('status' => 500));
+        }
+
+        update_post_meta($post_id, 'name', $name);
+        update_post_meta($post_id, 'email', $email);
+        update_post_meta($post_id, 'subject', $subject);
+        update_post_meta($post_id, 'message', $message);
+        update_post_meta($post_id, 'status', 'new');
+
+        return new WP_REST_Response($this->map_contact_post($post_id), 201);
+    }
+
+    public function list_contact_submissions(WP_REST_Request $request) {
+        $page = max(1, (int) $request->get_param('page'));
+        $per_page = min(100, max(1, (int) $request->get_param('per_page')));
+        $status = sanitize_text_field((string) $request->get_param('status'));
+        $search = sanitize_text_field((string) $request->get_param('search'));
+
+        $query_args = array(
+            'post_type' => self::CONTACT_POST_TYPE,
+            'post_status' => 'publish',
+            'posts_per_page' => $per_page,
+            'paged' => $page,
+            's' => $search,
+            'orderby' => 'date',
+            'order' => 'DESC',
+        );
+
+        if ($status !== '') {
+            $query_args['meta_query'] = array(
+                array(
+                    'key' => 'status',
+                    'value' => $status,
+                    'compare' => '=',
+                ),
+            );
+        }
+
+        $query = new WP_Query($query_args);
+        $items = array();
+
+        foreach ($query->posts as $post) {
+            $items[] = $this->map_contact_post($post->ID);
+        }
+
+        return new WP_REST_Response(
+            array(
+                'items' => $items,
+                'page' => $page,
+                'per_page' => $per_page,
+                'total' => (int) $query->found_posts,
+                'total_pages' => (int) $query->max_num_pages,
+            ),
+            200
+        );
+    }
+
+    public function get_contact_submission(WP_REST_Request $request) {
+        $id = (int) $request['id'];
+        $post = get_post($id);
+
+        if (!$post || $post->post_type !== self::CONTACT_POST_TYPE) {
+            return new WP_Error('not_found', 'Contact submission not found.', array('status' => 404));
+        }
+
+        return new WP_REST_Response($this->map_contact_post($id), 200);
+    }
+
+    public function update_contact_submission(WP_REST_Request $request) {
+        $id = (int) $request['id'];
+        $post = get_post($id);
+
+        if (!$post || $post->post_type !== self::CONTACT_POST_TYPE) {
+            return new WP_Error('not_found', 'Contact submission not found.', array('status' => 404));
+        }
+
+        $allowed_status = array('new', 'in_progress', 'resolved');
+        $status = sanitize_text_field((string) $request->get_param('status'));
+        $admin_note = sanitize_textarea_field((string) $request->get_param('admin_note'));
+
+        if ($status !== '' && !in_array($status, $allowed_status, true)) {
+            return new WP_Error('invalid_status', 'Invalid status value.', array('status' => 400));
+        }
+
+        if ($status !== '') {
+            update_post_meta($id, 'status', $status);
+        }
+
+        if ($admin_note !== '') {
+            update_post_meta($id, 'admin_note', $admin_note);
+        }
+
+        return new WP_REST_Response($this->map_contact_post($id), 200);
     }
 }
 

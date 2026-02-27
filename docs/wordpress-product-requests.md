@@ -12,6 +12,10 @@ This document describes exactly what was implemented in the plugin at:
 - `GET /wp-json/custom/v1/product-requests`
 - `GET /wp-json/custom/v1/product-requests/{id}`
 - `PATCH /wp-json/custom/v1/product-requests/{id}`
+- `POST /wp-json/custom/v1/contact-submission`
+- `GET /wp-json/custom/v1/contact-submissions`
+- `GET /wp-json/custom/v1/contact-submissions/{id}`
+- `PATCH /wp-json/custom/v1/contact-submissions/{id}`
 
 ## 2) Data storage model
 
@@ -171,3 +175,107 @@ Required env var in storefront:
 - `VITE_WP_BASE_URL=https://api.ebemglobal.com`
 
 If your WordPress API is on a different domain than the storefront, ensure CORS is configured on the WordPress host/reverse proxy.
+
+## 8) Contact submissions API
+
+Contact submissions are now stored as custom posts:
+- Post type: `contact_submission`
+- Meta fields:
+  - `name`
+  - `email`
+  - `subject`
+  - `message`
+  - `status` (`new`, `in_progress`, `resolved`)
+  - `admin_note` (optional)
+
+### `POST /wp-json/custom/v1/contact-submission`
+
+Public endpoint. Content type: `application/json`
+
+Payload:
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "subject": "Bulk order enquiry",
+  "message": "I need 500 units quotation."
+}
+```
+
+Response `201`:
+```json
+{
+  "id": 321,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "subject": "Bulk order enquiry",
+  "message": "I need 500 units quotation.",
+  "status": "new",
+  "admin_note": "",
+  "created_at": "2026-02-27 14:20:00",
+  "updated_at": "2026-02-27 14:20:00"
+}
+```
+
+### `GET /wp-json/custom/v1/contact-submissions`
+
+Authenticated admin endpoint (Application Password + `edit_posts`)
+
+Query params:
+- `page` (default 1)
+- `per_page` (default 20, max 100)
+- `status` (`new|in_progress|resolved`)
+- `search` (text search)
+
+Response `200`:
+```json
+{
+  "items": [],
+  "page": 1,
+  "per_page": 20,
+  "total": 0,
+  "total_pages": 0
+}
+```
+
+### `GET /wp-json/custom/v1/contact-submissions/{id}`
+
+Returns one contact submission record.
+
+### `PATCH /wp-json/custom/v1/contact-submissions/{id}`
+
+Payload fields:
+- `status` (`new|in_progress|resolved`)
+- `admin_note` (text)
+
+Example:
+```json
+{
+  "status": "in_progress",
+  "admin_note": "Assigned to sourcing operations."
+}
+```
+
+## 9) cURL examples for contact submissions
+
+### Public contact submit
+```bash
+curl -X POST "https://YOUR_WP_SITE/wp-json/custom/v1/contact-submission" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Jane Doe","email":"jane@example.com","subject":"Partnership","message":"Please contact me."}'
+```
+
+### Admin contact list
+```bash
+curl -u "wp_username:xxxx xxxx xxxx xxxx xxxx xxxx" \
+  "https://YOUR_WP_SITE/wp-json/custom/v1/contact-submissions?page=1&per_page=20&status=new"
+```
+
+### Admin contact update
+```bash
+curl -X PATCH \
+  -u "wp_username:xxxx xxxx xxxx xxxx xxxx xxxx" \
+  -H "Content-Type: application/json" \
+  -d '{"status":"resolved","admin_note":"Handled successfully."}' \
+  "https://YOUR_WP_SITE/wp-json/custom/v1/contact-submissions/321"
+```

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Grid3X3, List } from 'lucide-react';
+import { Grid3X3, List, Search, SlidersHorizontal, X } from 'lucide-react';
 import { Link } from 'react-router';
 import { useApp } from '../context/AppContext';
 import { getProducts } from '../services/products';
@@ -11,6 +11,11 @@ export default function Shop() {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>(['All']);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
+  const [stockFilter, setStockFilter] = useState<'all' | 'ready' | 'preorder'>('all');
+  const [sortBy, setSortBy] = useState<'relevance' | 'priceAsc' | 'priceDesc' | 'nameAsc'>('relevance');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addToCart, openPanel } = useApp();
@@ -40,10 +45,59 @@ export default function Shop() {
     };
   }, []);
 
+  const maxCatalogPrice = useMemo(() => {
+    if (products.length === 0) return 0;
+    return Math.max(...products.map((product) => product.price));
+  }, [products]);
+
   const filtered = useMemo(() => {
-    if (activeCat === 'All') return products;
-    return products.filter((product) => product.categories.includes(activeCat));
-  }, [activeCat, products]);
+    const query = searchTerm.trim().toLowerCase();
+    const parsedMin = Number.parseFloat(priceMin);
+    const parsedMax = Number.parseFloat(priceMax);
+    const hasMin = Number.isFinite(parsedMin) && parsedMin >= 0;
+    const hasMax = Number.isFinite(parsedMax) && parsedMax >= 0;
+
+    const filteredProducts = products.filter((product) => {
+      if (activeCat !== 'All' && !product.categories.includes(activeCat)) return false;
+      if (stockFilter === 'ready' && product.badge !== 'Ready Stock') return false;
+      if (stockFilter === 'preorder' && product.badge !== 'Pre-Order') return false;
+      if (hasMin && product.price < parsedMin) return false;
+      if (hasMax && product.price > parsedMax) return false;
+      if (!query) return true;
+
+      const haystack = `${product.name} ${product.category} ${product.categories.join(' ')} ${product.shortDescription}`.toLowerCase();
+      return haystack.includes(query);
+    });
+
+    if (sortBy === 'priceAsc') {
+      return [...filteredProducts].sort((a, b) => a.price - b.price);
+    }
+    if (sortBy === 'priceDesc') {
+      return [...filteredProducts].sort((a, b) => b.price - a.price);
+    }
+    if (sortBy === 'nameAsc') {
+      return [...filteredProducts].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return filteredProducts;
+  }, [activeCat, priceMax, priceMin, products, searchTerm, sortBy, stockFilter]);
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (searchTerm.trim()) count += 1;
+    if (priceMin.trim()) count += 1;
+    if (priceMax.trim()) count += 1;
+    if (stockFilter !== 'all') count += 1;
+    if (sortBy !== 'relevance') count += 1;
+    return count;
+  }, [priceMax, priceMin, searchTerm, sortBy, stockFilter]);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setPriceMin('');
+    setPriceMax('');
+    setStockFilter('all');
+    setSortBy('relevance');
+  };
 
   return (
     <div className="pt-20 lg:pt-24 min-h-screen bg-white">
@@ -81,6 +135,93 @@ export default function Shop() {
             <button onClick={() => setView('list')} className={`p-2 ${view === 'list' ? 'text-black' : 'text-gray-300'}`}>
               <List className="w-4 h-4" />
             </button>
+          </div>
+        </div>
+
+        <div className="mb-8 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 lg:p-5">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div className="inline-flex items-center gap-2 text-gray-800">
+              <SlidersHorizontal className="w-4 h-4" />
+              <p className="text-xs uppercase tracking-[0.2em]" style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}>
+                Filter Products
+              </p>
+            </div>
+            {activeFilterCount > 0 && (
+              <button
+                onClick={clearFilters}
+                className="inline-flex items-center gap-1 text-xs uppercase tracking-widest text-gray-500 hover:text-black transition-colors"
+                style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+              >
+                <X className="w-3.5 h-3.5" />
+                Clear ({activeFilterCount})
+              </button>
+            )}
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+            <label className="relative md:col-span-2 lg:col-span-2">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Search by product, category, or keyword"
+                className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 bg-white rounded-xl focus:outline-none focus:border-black"
+                style={{ fontFamily: 'var(--font-body)' }}
+              />
+            </label>
+
+            <input
+              type="number"
+              min={0}
+              value={priceMin}
+              onChange={(event) => setPriceMin(event.target.value)}
+              placeholder="Min price"
+              className="w-full px-3 py-2.5 text-sm border border-gray-200 bg-white rounded-xl focus:outline-none focus:border-black"
+              style={{ fontFamily: 'var(--font-body)' }}
+            />
+
+            <input
+              type="number"
+              min={0}
+              value={priceMax}
+              onChange={(event) => setPriceMax(event.target.value)}
+              placeholder={`Max (${maxCatalogPrice > 0 ? formatNaira(maxCatalogPrice) : 'any'})`}
+              className="w-full px-3 py-2.5 text-sm border border-gray-200 bg-white rounded-xl focus:outline-none focus:border-black"
+              style={{ fontFamily: 'var(--font-body)' }}
+            />
+
+            <select
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value as typeof sortBy)}
+              className="w-full px-3 py-2.5 text-sm border border-gray-200 bg-white rounded-xl focus:outline-none focus:border-black"
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
+              <option value="relevance">Sort: Relevance</option>
+              <option value="priceAsc">Price: Low to High</option>
+              <option value="priceDesc">Price: High to Low</option>
+              <option value="nameAsc">Name: A to Z</option>
+            </select>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            {[
+              { key: 'all', label: 'All stock' },
+              { key: 'ready', label: 'Ready Stock' },
+              { key: 'preorder', label: 'Pre-Order' },
+            ].map((option) => (
+              <button
+                key={option.key}
+                onClick={() => setStockFilter(option.key as typeof stockFilter)}
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-full border transition-colors ${
+                  stockFilter === option.key
+                    ? 'bg-black text-white border-black'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-black'
+                }`}
+                style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
         </div>
 
