@@ -1,9 +1,9 @@
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
-import { env } from './env.js';
-import { productsRouter } from './routes/products.js';
-import { aiSearchRouter } from './routes/aiSearch.js';
+import { env } from './env';
+import { productsRouter } from './routes/products';
+import { aiSearchRouter } from './routes/aiSearch';
 
 const app = express();
 

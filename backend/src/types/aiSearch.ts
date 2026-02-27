@@ -32,5 +32,7 @@ export interface AiSearchResponse {
   insights: string;
   followUpQuestions: string[];
   recommendations: AiRecommendation[];
+  complementaryRecommendations: AiRecommendation[];
+  noMatchMessage?: string;
   totalCatalogSize: number;
 }

@@ -59,6 +59,13 @@ function buildFallbackWhy(product: Product): string {
   return `${product.name} is a strong match in ${category} with current pricing and availability.`;
 }
 
+function overlapsQuery(product: Product, tokens: string[]): boolean {
+  if (tokens.length === 0) return false;
+  const name = product.name.toLowerCase();
+  const categories = product.categories.map((category) => category.toLowerCase());
+  return tokens.some((token) => name.includes(token) || categories.some((category) => category.includes(token)));
+}
+
 function pickFollowUps(query: string): string[] {
   const questions: string[] = [];
   if (!/(under|below|less|budget|above|over|\d)/i.test(query)) {
@@ -213,29 +220,45 @@ export async function runAiSearch(input: AiSearchRequest): Promise<AiSearchRespo
   const ranked = filtered
     .map((product) => ({ product, score: scoreProduct(product, tokens, parsed.intent.normalizedQuery) }))
     .filter((entry) => entry.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit);
+    .sort((a, b) => b.score - a.score);
 
-  const recommendations: AiRecommendation[] = ranked.map(({ product, score }) => ({
+  const primaryRanked = ranked.filter(({ product }) => overlapsQuery(product, tokens)).slice(0, limit);
+  const complementaryRanked = ranked
+    .filter(({ product }) => !primaryRanked.some((entry) => entry.product.id === product.id))
+    .slice(0, Math.max(2, Math.floor(limit / 2)));
+
+  const recommendations: AiRecommendation[] = primaryRanked.map(({ product, score }) => ({
     ...product,
     score: Number(score.toFixed(2)),
     why: buildFallbackWhy(product),
   }));
+  const complementaryRecommendations: AiRecommendation[] = complementaryRanked.map(({ product, score }) => ({
+    ...product,
+    score: Number(score.toFixed(2)),
+    why: `${product.name} complements this search based on category fit, value, and availability.`,
+  }));
 
   let insights = 'I found options from our store that best match your request.';
   let followUpQuestions = pickFollowUps(input.query);
+  let noMatchMessage: string | undefined;
 
-  try {
-    const ai = await generateAiInsight(input.query, recommendations, categories);
-    insights = ai.insights;
-    followUpQuestions = ai.followUpQuestions;
-    for (const recommendation of recommendations) {
-      if (ai.reasons[recommendation.id]) {
-        recommendation.why = ai.reasons[recommendation.id];
+  if (recommendations.length === 0) {
+    noMatchMessage = 'No exact match is available right now, but we can source it for you.';
+    insights = '';
+    followUpQuestions = [];
+  } else {
+    try {
+      const ai = await generateAiInsight(input.query, recommendations, categories);
+      insights = ai.insights;
+      followUpQuestions = ai.followUpQuestions;
+      for (const recommendation of recommendations) {
+        if (ai.reasons[recommendation.id]) {
+          recommendation.why = ai.reasons[recommendation.id];
+        }
       }
+    } catch {
+      // Fall back to deterministic recommendations if OpenRouter is unavailable.
     }
-  } catch {
-    // Fall back to deterministic recommendations if OpenRouter is unavailable.
   }
 
   return {
@@ -244,6 +267,8 @@ export async function runAiSearch(input: AiSearchRequest): Promise<AiSearchRespo
     insights,
     followUpQuestions,
     recommendations,
+    complementaryRecommendations,
+    noMatchMessage,
     totalCatalogSize: catalog.length,
   };
 }

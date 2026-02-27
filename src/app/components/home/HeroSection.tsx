@@ -5,8 +5,8 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 const SLIDES = [
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1674573071057-029f03b6add6?w=1920&q=85',
-    eyebrow: 'Ebem Global — Making Global Trade Easy',
+    image: '/assets/china%20market.png',
+    eyebrow: 'Ebem Global - Making Global Trade Easy',
     headline: 'Factory\nPrices.\nNo\nMiddlemen.',
     sub: 'We connect Africa directly to verified Chinese manufacturers. Real products, transparent pricing, zero middlemen.',
     cta: 'Shop Now',
@@ -14,7 +14,16 @@ const SLIDES = [
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1631349549824-fc1f8d971e3e?w=1920&q=85',
+    image: '/assets/gadgets.jpg',
+    eyebrow: 'Trending Gadgets',
+    headline: 'Smart\nGadgets.\nBetter\nMargins.',
+    sub: 'Find high-demand gadgets at factory-backed pricing, selected for African retail performance.',
+    cta: 'Explore Gadgets',
+    href: '/shop',
+  },
+  {
+    id: 3,
+    image: '/assets/warehouse.jpg',
     eyebrow: 'Nigeria Ready Stock',
     headline: 'Now In\nNigeria.\nShip\nToday.',
     sub: 'Hundreds of products available in Nigeria for immediate delivery. No waiting, no customs stress.',
@@ -22,11 +31,20 @@ const SLIDES = [
     href: '/shop',
   },
   {
-    id: 3,
-    image: 'https://images.unsplash.com/photo-1744907895363-d351aa6019ef?w=1920&q=85',
-    eyebrow: 'China Pre-Order Access',
+    id: 4,
+    image: '/assets/fashion.png',
+    eyebrow: 'Fashion Supply',
+    headline: 'Fashion\nCollections.\nDirect\nFactory.',
+    sub: 'Source fashion products with better quality control and pricing from verified suppliers.',
+    cta: 'Shop Fashion',
+    href: '/shop',
+  },
+  {
+    id: 5,
+    image: '/assets/shiping.png',
+    eyebrow: 'China Shipping Access',
     headline: 'Pre-Order\nFrom China\nBefore It\nTrends.',
-    sub: "Access products directly from Chinese factories before they hit Nigerian markets. Ebem Global handles sourcing, shipping, and customs.",
+    sub: 'Access products directly from Chinese factories before they hit Nigerian markets. Ebem Global handles sourcing, shipping, and customs.',
     cta: 'Pre-Order Now',
     href: '/shop',
   },
@@ -175,3 +193,4 @@ export function HeroSection() {
     </section>
   );
 }
+

@@ -27,8 +27,10 @@ export function AISearchPanel() {
   const [phChar, setPhChar] = useState(0);
   const [displayPh, setDisplayPh] = useState('');
   const [results, setResults] = useState<AiRecommendation[]>([]);
+  const [complements, setComplements] = useState<AiRecommendation[]>([]);
   const [insights, setInsights] = useState('');
   const [followUps, setFollowUps] = useState<string[]>([]);
+  const [noMatchMessage, setNoMatchMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,8 +66,10 @@ export function AISearchPanel() {
     const trimmed = query.trim();
     if (!trimmed) {
       setResults([]);
+      setComplements([]);
       setInsights('');
       setFollowUps([]);
+      setNoMatchMessage('');
       setError(null);
       setLoading(false);
       return;
@@ -78,8 +82,10 @@ export function AISearchPanel() {
         const response = await searchWithAi(trimmed, 6);
         if (!active) return;
         setResults(response.recommendations);
+        setComplements(response.complementaryRecommendations ?? []);
         setInsights(response.insights);
         setFollowUps(response.followUpQuestions);
+        setNoMatchMessage(response.noMatchMessage ?? '');
         setError(null);
       } catch (err) {
         if (!active) return;
@@ -195,9 +201,44 @@ export function AISearchPanel() {
 
           {results.length > 0 && (
             <div>
-              <p className="text-xs uppercase tracking-widest text-gray-400 mb-4">Recommended for you</p>
+              <p className="text-xs uppercase tracking-widest text-gray-400 mb-4">Matching your request</p>
               <div className="space-y-4">
                 {results.map((item) => (
+                  <div key={item.id} className="flex gap-4 p-3 rounded-xl border border-gray-100 hover:border-black transition-all duration-200 hover:shadow-md group">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${item.badge === 'Pre-Order' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                          {item.badge}
+                        </span>
+                        <p className="text-gray-900 mt-1 text-sm" style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}>
+                          {item.name}
+                        </p>
+                        <p className="text-gray-900" style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem' }}>
+                          {formatNaira(item.price)}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1 leading-relaxed">{item.why}</p>
+                      </div>
+                      <button
+                        onClick={() => addToCart({ id: item.id, name: item.name, price: item.price, image: item.image, badge: item.badge })}
+                        className="text-xs bg-black text-white px-3 py-1.5 rounded-full hover:bg-gray-800 transition-all hover:scale-[1.02] w-fit"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {complements.length > 0 && (
+            <div className="mt-6">
+              <p className="text-xs uppercase tracking-widest text-gray-400 mb-4">You may also consider</p>
+              <div className="space-y-4">
+                {complements.map((item) => (
                   <div key={item.id} className="flex gap-4 p-3 rounded-xl border border-gray-100 hover:border-black transition-all duration-200 hover:shadow-md group">
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -250,11 +291,8 @@ export function AISearchPanel() {
               <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="w-7 h-7 text-gray-300" />
               </div>
-              <p className="text-gray-900 mb-1" style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem' }}>
-                Not in stock yet.
-              </p>
-              <p className="text-gray-400 text-sm mb-6">
-                We do not currently have that item, but we can source it for you.
+              <p className="text-gray-500 text-sm mb-6">
+                {noMatchMessage || 'No exact match is available right now, but we can source it for you.'}
               </p>
               <button
                 onClick={handleRequestThis}

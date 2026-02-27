@@ -24,6 +24,7 @@ export const router = createBrowserRouter([
       { path: 'contact', Component: Contact },
       { path: 'blog', Component: Blog },
       { path: 'blog/:slug', Component: Blog },
+      // Note: Blog.tsx handles both list and single post via useParams
       { path: 'account', Component: Account },
       { path: 'checkout', Component: Checkout },
       { path: 'payment', Component: Payment },
