@@ -5,7 +5,7 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 const SLIDES = [
   {
     id: 1,
-    image: '/assets/china%20market.png',
+    image: '/assets/china-market.png',
     eyebrow: 'Ebem Global - Making Global Trade Easy',
     headline: 'Factory\nPrices.\nNo\nMiddlemen.',
     sub: 'We connect Africa directly to verified Chinese manufacturers. Real products, transparent pricing, zero middlemen.',
@@ -41,7 +41,7 @@ const SLIDES = [
   },
   {
     id: 5,
-    image: '/assets/shiping.png',
+    image: '/assets/shipping.png',
     eyebrow: 'China Shipping Access',
     headline: 'Pre-Order\nFrom China\nBefore It\nTrends.',
     sub: 'Access products directly from Chinese factories before they hit Nigerian markets. Ebem Global handles sourcing, shipping, and customs.',
