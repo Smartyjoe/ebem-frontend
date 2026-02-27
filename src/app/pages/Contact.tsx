@@ -1,13 +1,26 @@
 import { useState } from 'react';
 import { Mail, Phone, MapPin, CheckCircle } from 'lucide-react';
+import { submitContactSubmission } from '../services/contactSubmissions';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError('');
+    try {
+      await submitContactSubmission(form);
+      setSubmitted(true);
+      setForm({ name: '', email: '', subject: '', message: '' });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to submit your message right now.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -85,9 +98,19 @@ export default function Contact() {
                   <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2" style={{ fontFamily: 'var(--font-body)' }}>Message *</label>
                   <textarea required value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} rows={6} placeholder="Tell us about your sourcing needs..." className="w-full px-4 py-3 border border-gray-200 bg-gray-50 focus:outline-none focus:border-black focus:bg-white text-sm transition-all resize-none" style={{ fontFamily: 'var(--font-body)' }} />
                 </div>
-                <button type="submit" className="w-full py-4 bg-black text-white text-xs uppercase tracking-widest hover:scale-[1.02] hover:shadow-xl transition-all duration-200" style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}>
-                  Send Message
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full py-4 bg-black text-white text-xs uppercase tracking-widest hover:scale-[1.02] hover:shadow-xl transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+                >
+                  {submitting ? 'Sending...' : 'Send Message'}
                 </button>
+                {error && (
+                  <p className="text-sm text-red-600" style={{ fontFamily: 'var(--font-body)' }}>
+                    {error}
+                  </p>
+                )}
               </form>
             )}
           </div>

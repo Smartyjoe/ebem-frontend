@@ -173,6 +173,15 @@ final class EPR_Product_Requests_Plugin {
         return current_user_can('edit_posts');
     }
 
+    private function contact_debug_log($event, $context = array()) {
+        $payload = array(
+            'event' => $event,
+            'context' => $context,
+            'ts' => gmdate('c'),
+        );
+        error_log('[ebem_contact_debug] ' . wp_json_encode($payload));
+    }
+
     private function get_client_ip() {
         $keys = array('HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR');
         foreach ($keys as $key) {
@@ -413,8 +422,16 @@ final class EPR_Product_Requests_Plugin {
     }
 
     public function create_contact_submission(WP_REST_Request $request) {
+        $this->contact_debug_log('create_start', array(
+            'has_name' => (string) $request->get_param('name') !== '',
+            'has_email' => (string) $request->get_param('email') !== '',
+            'has_subject' => (string) $request->get_param('subject') !== '',
+            'has_message' => (string) $request->get_param('message') !== '',
+        ));
+
         $rate = $this->enforce_rate_limit();
         if (is_wp_error($rate)) {
+            $this->contact_debug_log('create_rate_limited');
             return $rate;
         }
 
@@ -424,6 +441,12 @@ final class EPR_Product_Requests_Plugin {
         $message = sanitize_textarea_field((string) $request->get_param('message'));
 
         if ($name === '' || !is_email($email) || $subject === '' || $message === '') {
+            $this->contact_debug_log('create_invalid_input', array(
+                'name' => $name !== '',
+                'email_valid' => is_email($email),
+                'subject' => $subject !== '',
+                'message' => $message !== '',
+            ));
             return new WP_Error('invalid_input', 'Missing or invalid contact fields.', array('status' => 400));
         }
 
@@ -437,6 +460,9 @@ final class EPR_Product_Requests_Plugin {
         );
 
         if (is_wp_error($post_id)) {
+            $this->contact_debug_log('create_insert_failed', array(
+                'error' => $post_id->get_error_message(),
+            ));
             return new WP_Error('contact_create_failed', 'Unable to submit contact message.', array('status' => 500));
         }
 
@@ -446,6 +472,7 @@ final class EPR_Product_Requests_Plugin {
         update_post_meta($post_id, 'message', $message);
         update_post_meta($post_id, 'status', 'new');
 
+        $this->contact_debug_log('create_success', array('id' => (int) $post_id));
         return new WP_REST_Response($this->map_contact_post($post_id), 201);
     }
 
@@ -454,6 +481,14 @@ final class EPR_Product_Requests_Plugin {
         $per_page = min(100, max(1, (int) $request->get_param('per_page')));
         $status = sanitize_text_field((string) $request->get_param('status'));
         $search = sanitize_text_field((string) $request->get_param('search'));
+
+        $this->contact_debug_log('list_start', array(
+            'page' => $page,
+            'per_page' => $per_page,
+            'status' => $status,
+            'search' => $search,
+            'can_edit_posts' => current_user_can('edit_posts'),
+        ));
 
         $query_args = array(
             'post_type' => self::CONTACT_POST_TYPE,
@@ -482,6 +517,11 @@ final class EPR_Product_Requests_Plugin {
             $items[] = $this->map_contact_post($post->ID);
         }
 
+        $this->contact_debug_log('list_success', array(
+            'found' => (int) $query->found_posts,
+            'returned' => count($items),
+        ));
+
         return new WP_REST_Response(
             array(
                 'items' => $items,
@@ -498,10 +538,18 @@ final class EPR_Product_Requests_Plugin {
         $id = (int) $request['id'];
         $post = get_post($id);
 
+        $this->contact_debug_log('get_start', array(
+            'id' => $id,
+            'post_exists' => (bool) $post,
+            'post_type' => $post ? $post->post_type : null,
+        ));
+
         if (!$post || $post->post_type !== self::CONTACT_POST_TYPE) {
+            $this->contact_debug_log('get_not_found', array('id' => $id));
             return new WP_Error('not_found', 'Contact submission not found.', array('status' => 404));
         }
 
+        $this->contact_debug_log('get_success', array('id' => $id));
         return new WP_REST_Response($this->map_contact_post($id), 200);
     }
 
@@ -509,7 +557,14 @@ final class EPR_Product_Requests_Plugin {
         $id = (int) $request['id'];
         $post = get_post($id);
 
+        $this->contact_debug_log('update_start', array(
+            'id' => $id,
+            'post_exists' => (bool) $post,
+            'post_type' => $post ? $post->post_type : null,
+        ));
+
         if (!$post || $post->post_type !== self::CONTACT_POST_TYPE) {
+            $this->contact_debug_log('update_not_found', array('id' => $id));
             return new WP_Error('not_found', 'Contact submission not found.', array('status' => 404));
         }
 
@@ -518,6 +573,10 @@ final class EPR_Product_Requests_Plugin {
         $admin_note = sanitize_textarea_field((string) $request->get_param('admin_note'));
 
         if ($status !== '' && !in_array($status, $allowed_status, true)) {
+            $this->contact_debug_log('update_invalid_status', array(
+                'id' => $id,
+                'status' => $status,
+            ));
             return new WP_Error('invalid_status', 'Invalid status value.', array('status' => 400));
         }
 
@@ -529,6 +588,11 @@ final class EPR_Product_Requests_Plugin {
             update_post_meta($id, 'admin_note', $admin_note);
         }
 
+        $this->contact_debug_log('update_success', array(
+            'id' => $id,
+            'status' => $status,
+            'has_admin_note' => $admin_note !== '',
+        ));
         return new WP_REST_Response($this->map_contact_post($id), 200);
     }
 }
