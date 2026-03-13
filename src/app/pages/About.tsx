@@ -1,5 +1,6 @@
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useApp } from '../context/AppContext';
+import { trackAffiliateCtaClick } from '../services/affiliate';
 
 const VALUES = [
   { title: 'Integrity', desc: 'We operate with honesty, verification, and accountability in every transaction.' },
@@ -13,6 +14,8 @@ const VALUES = [
 export default function About() {
   const { ref, visible } = useScrollReveal();
   const { openPanel } = useApp();
+  const affiliateMidUrl = '/earn';
+  const affiliateBottomUrl = '/earn';
 
   return (
     <div className="pt-20 lg:pt-24 min-h-screen bg-white">
@@ -67,6 +70,30 @@ export default function About() {
               style={{ aspectRatio: '4/3', filter: 'grayscale(0.2)' }}
             />
           </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 pb-14">
+        <div className="rounded-2xl border border-gray-200 bg-[#f4f7fb] p-6 lg:p-8 grid lg:grid-cols-[1.3fr_auto] gap-4 items-center">
+          <div>
+            <p className="text-xs uppercase tracking-[0.22em] text-gray-500 mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+              Affiliate Opportunity
+            </p>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.9rem,4vw,3.2rem)', lineHeight: 0.95 }}>
+              Earn with the same ecosystem you already trust.
+            </h3>
+            <p className="text-sm text-gray-600 mt-3" style={{ fontFamily: 'var(--font-body)' }}>
+              Promote products, invite affiliates, and convert audience attention into measurable commission streams.
+            </p>
+          </div>
+          <a
+            href={affiliateMidUrl}
+            onClick={() => trackAffiliateCtaClick('about_mid')}
+            className="inline-flex items-center justify-center bg-black text-white px-7 py-3 rounded-xl text-xs uppercase tracking-[0.18em]"
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+          >
+            Earn With EbemGlobal
+          </a>
         </div>
       </div>
 
@@ -132,6 +159,27 @@ export default function About() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 lg:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.22em] text-gray-500 mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+              Growth Layer
+            </p>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.8rem,4vw,3rem)', lineHeight: 0.95 }}>
+              Turn your network into a second income engine.
+            </h3>
+          </div>
+          <a
+            href={affiliateBottomUrl}
+            onClick={() => trackAffiliateCtaClick('about_bottom')}
+            className="inline-flex items-center justify-center bg-black text-white px-7 py-3 rounded-xl text-xs uppercase tracking-[0.18em]"
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+          >
+            Join Affiliate Network
+          </a>
         </div>
       </div>
 

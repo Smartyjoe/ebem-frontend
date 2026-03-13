@@ -7,7 +7,7 @@ const CATEGORIES = [
     id: 1,
     name: 'Fashion & Apparel',
     count: 'Direct from China',
-    image: 'https://images.unsplash.com/photo-1762343264418-1467f9394f49?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600&q=80',
     span: 'col-span-2 row-span-2',
     href: '/shop?cat=fashion',
   },

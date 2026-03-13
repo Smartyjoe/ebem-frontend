@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router';
 import { ShoppingBag, Search, Package, Menu, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ProfileButton } from './ProfileButton';
+import { trackAffiliateCtaClick } from '../services/affiliate';
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
@@ -168,6 +169,19 @@ export function Header() {
             >
               Request Product
             </button>
+          </div>
+          <div className="mt-auto pb-10">
+            <Link
+              to="/earn"
+              onClick={() => {
+                trackAffiliateCtaClick('mobile_menu_earn_with_us');
+                setMobileOpen(false);
+              }}
+              className="inline-flex items-center text-xs uppercase tracking-[0.2em] text-gray-500 hover:text-black border-b border-gray-300 pb-1"
+              style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+            >
+              Earn With Us
+            </Link>
           </div>
         </div>
       </div>

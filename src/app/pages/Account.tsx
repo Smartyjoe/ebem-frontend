@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, LogOut, Mail, MapPin, Phone, Shield, User, User2 } from 'lucide-react';
+import { hasAffiliateJoinIntent, trackAffiliateCtaClick } from '../services/affiliate';
 
 export default function Account() {
   const { user, loading, login, register, updateProfile, logout, requestPassword } = useAuth();
@@ -71,6 +72,22 @@ function Unauthed({ tab, setTab, onLogin, onRegister, onForgot }:
           <li>• Save your details for faster checkout</li>
           <li>• Access invoices and order history</li>
         </ul>
+        <div className="mt-6 border-t border-white/15 pt-5">
+          <p className="text-xs uppercase tracking-[0.2em] text-white/50 mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+            Affiliate Add-on
+          </p>
+          <p className="text-sm text-white/80 mb-3" style={{ fontFamily: 'var(--font-body)' }}>
+            Open an account and activate affiliate earnings from your referrals.
+          </p>
+          <a
+            href="/earn"
+            onClick={() => trackAffiliateCtaClick('account_unauth_side')}
+            className="inline-flex items-center bg-white text-black px-4 py-2 rounded-lg text-xs uppercase tracking-[0.18em]"
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 700 }}
+          >
+            Learn Affiliate Benefits
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -90,6 +107,27 @@ function Authed({ onLogout, onUpdate }:
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="border rounded-xl p-6 lg:col-span-2">
+        <div className="mb-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs uppercase tracking-[0.18em] text-gray-500 mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+            Affiliate Earnings
+          </p>
+          <h4 className="text-2xl mb-2" style={{ fontFamily: 'var(--font-display)', lineHeight: 1 }}>
+            Activate your affiliate dashboard.
+          </h4>
+          <p className="text-sm text-gray-600 mb-3" style={{ fontFamily: 'var(--font-body)' }}>
+            {hasAffiliateJoinIntent()
+              ? 'You started affiliate activation. Continue setup in the dashboard.'
+              : 'Turn your account into an additional revenue channel through tracked referrals.'}
+          </p>
+          <a
+            href="/earn"
+            onClick={() => trackAffiliateCtaClick('account_dashboard_banner')}
+            className="inline-flex items-center bg-black text-white px-4 py-2.5 rounded-lg text-xs uppercase tracking-[0.18em]"
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+          >
+            Activate Affiliate Earnings
+          </a>
+        </div>
         <h3 className="text-lg mb-4" style={{ fontFamily: 'var(--font-display)' }}>Profile details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input label="First name" value={first} onChange={setFirst} />
@@ -132,6 +170,22 @@ function OrdersCard() {
           ))}
         </ul>
       )}
+      <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+          Affiliate CTA
+        </p>
+        <p className="text-sm text-gray-600 mb-3" style={{ fontFamily: 'var(--font-body)' }}>
+          Activate affiliate payouts and earn beyond your own purchases.
+        </p>
+        <a
+          href="/earn"
+          onClick={() => trackAffiliateCtaClick('account_orders_card_ad')}
+          className="inline-flex items-center bg-black text-white px-4 py-2 rounded-lg text-xs uppercase tracking-[0.18em]"
+          style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+        >
+          Activate Earnings
+        </a>
+      </div>
     </div>
   );
 }

@@ -12,6 +12,10 @@ import Checkout from './pages/Checkout';
 import Payment from './pages/Payment';
 import ThankYou from './pages/ThankYou';
 import RequestTest from './pages/RequestTest';
+import Earn from './pages/Earn';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import RefundReturnPolicy from './pages/RefundReturnPolicy';
+import DeliveryPolicy from './pages/DeliveryPolicy';
 
 export const router = createBrowserRouter([
   {
@@ -31,6 +35,10 @@ export const router = createBrowserRouter([
       { path: 'payment', Component: Payment },
       { path: 'thank-you', Component: ThankYou },
       { path: 'request-test', Component: RequestTest },
+      { path: 'earn', Component: Earn },
+      { path: 'privacy-policy', Component: PrivacyPolicy },
+      { path: 'refund-return-policy', Component: RefundReturnPolicy },
+      { path: 'delivery-policy', Component: DeliveryPolicy },
       { path: '*', Component: NotFound },
     ],
   },

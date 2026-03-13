@@ -8,6 +8,7 @@ import {
   type WpPost, type WpCategory,
 } from '../services/wpBlog';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import { trackAffiliateCtaClick } from '../services/affiliate';
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function PostCardSkeleton() {
@@ -153,6 +154,7 @@ function BlogList() {
   };
 
   const [featured, ...rest] = posts;
+  const affiliateUrl = '/earn';
 
   return (
     <div className="min-h-screen pt-20 lg:pt-24">
@@ -210,6 +212,26 @@ function BlogList() {
             />
           </form>
         </div>
+
+        <aside className="mb-10 rounded-2xl border border-gray-200 bg-white p-6 lg:max-w-sm lg:ml-auto">
+          <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+            Affiliate CTA
+          </p>
+          <h3 className="text-2xl leading-tight mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+            Monetize your audience with EbemGlobal.
+          </h3>
+          <p className="text-sm text-gray-600 mb-4" style={{ fontFamily: 'var(--font-body)' }}>
+            Promote products, track referrals, and grow recurring commission streams.
+          </p>
+          <a
+            href={affiliateUrl}
+            onClick={() => trackAffiliateCtaClick('blog_sidebar')}
+            className="inline-flex items-center justify-center bg-black text-white rounded-xl px-5 py-3 text-xs uppercase tracking-[0.18em]"
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+          >
+            Join Affiliate Network
+          </a>
+        </aside>
 
         {/* Results count */}
         {!loading && total > 0 && (
@@ -400,6 +422,26 @@ function BlogPostView({ slug }: { slug: string }) {
           >
             More Articles
           </Link>
+        </div>
+
+        <div className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 p-5">
+          <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+            Affiliate CTA
+          </p>
+          <h3 className="text-2xl mb-2 leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
+            Monetize your audience with EbemGlobal.
+          </h3>
+          <p className="text-sm text-gray-600 mb-4" style={{ fontFamily: 'var(--font-body)' }}>
+            Turn readers into revenue with referral links and real-time conversion visibility.
+          </p>
+          <a
+            href="/earn"
+            onClick={() => trackAffiliateCtaClick('blog_post_footer')}
+            className="inline-flex items-center justify-center bg-black text-white rounded-xl px-5 py-3 text-xs uppercase tracking-[0.18em]"
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+          >
+            Become an Affiliate
+          </a>
         </div>
       </div>
     </div>

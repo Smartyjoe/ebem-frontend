@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
-import { Mail, Phone, MapPin, Instagram, Twitter, Youtube } from 'lucide-react';
+import { Mail, Phone, MapPin, Instagram, Facebook, MessageCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { trackAffiliateCtaClick } from '../services/affiliate';
 
 const QUICK_LINKS = [
   { label: 'Home', href: '/' },
@@ -8,6 +9,7 @@ const QUICK_LINKS = [
   { label: 'About Us', href: '/about' },
   { label: 'Blog', href: '/blog' },
   { label: 'Contact', href: '/contact' },
+  { label: 'Earn With Us', href: '/earn' },
 ];
 
 const SERVICES = [
@@ -19,6 +21,12 @@ const SERVICES = [
   'Dropshipping Support',
   'AI Product Search',
   'Trade Consulting',
+];
+
+const POLICY_LINKS = [
+  { label: 'Privacy Policy', href: '/privacy-policy' },
+  { label: 'Refund & Return Policy', href: '/refund-return-policy' },
+  { label: 'Delivery Policy', href: '/delivery-policy' },
 ];
 
 export function Footer() {
@@ -41,13 +49,16 @@ export function Footer() {
             </p>
             <div className="flex gap-3">
               {[
-                { Icon: Instagram, href: '#' },
-                { Icon: Twitter, href: '#' },
-                { Icon: Youtube, href: '#' },
-              ].map(({ Icon, href }, i) => (
+                { Icon: Facebook, href: 'https://www.facebook.com/share/1GJB6mkFSP/?mibextid=wwXIfr', label: 'Facebook' },
+                { Icon: MessageCircle, href: 'https://chat.whatsapp.com/HWaDDuJvR0dB6w7omjEDxv?mode=gi_t', label: 'WhatsApp Group' },
+                { Icon: Instagram, href: 'https://www.instagram.com/ebemglobal?igsh=MWdrdWh3bDEwcDQzMA%3D%3D&utm_source=qr', label: 'Instagram' },
+              ].map(({ Icon, href, label }, i) => (
                 <a
                   key={i}
                   href={href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label={label}
                   className="w-9 h-9 border border-white/20 rounded-full flex items-center justify-center hover:border-white hover:bg-white hover:text-black transition-all duration-200"
                 >
                   <Icon className="w-4 h-4" />
@@ -69,6 +80,9 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     to={link.href}
+                    onClick={() => {
+                      if (link.href === '/earn') trackAffiliateCtaClick('footer_earn_with_us');
+                    }}
                     className="text-white/60 hover:text-white text-sm transition-colors hover:translate-x-1 inline-block"
                     style={{ fontFamily: 'var(--font-body)' }}
                   >
@@ -170,15 +184,15 @@ export function Footer() {
             © 2026 Ebem Global. All Rights Reserved. Making Global Trade Easy, Direct, and Profitable.
           </p>
           <div className="flex items-center gap-6">
-            {['Privacy Policy', 'Terms of Service', 'Shipping Policy'].map(item => (
-              <a
-                key={item}
-                href="#"
+            {POLICY_LINKS.map(link => (
+              <Link
+                key={link.href}
+                to={link.href}
                 className="text-white/30 hover:text-white/60 text-xs transition-colors"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                {item}
-              </a>
+                {link.label}
+              </Link>
             ))}
           </div>
         </div>

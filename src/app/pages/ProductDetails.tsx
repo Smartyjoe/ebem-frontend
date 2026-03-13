@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext';
 import { getProductByReference, getProducts } from '../services/products';
 import type { Product } from '../types/product';
 import { formatNaira } from '../utils/currency';
+import { trackAffiliateCtaClick } from '../services/affiliate';
 
 function htmlToText(value: string): string {
   if (!value) return '';
@@ -113,6 +114,7 @@ export default function ProductDetails() {
   }, [descriptionText]);
 
   const currentImage = gallery[activeImage] ?? '';
+  const affiliateUrl = '/earn';
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -334,6 +336,19 @@ export default function ProductDetails() {
               {(descriptionParts.length > 0 ? descriptionParts : [product.shortDescription || 'Details are available on request from our sourcing team.']).map((part) => (
                 <p key={part}>{part}</p>
               ))}
+            </div>
+            <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4">
+              <p className="text-sm text-stone-700 mb-3" style={{ fontFamily: 'var(--font-body)' }}>
+                Love this product? Earn by promoting it.
+              </p>
+              <a
+                href={affiliateUrl}
+                onClick={() => trackAffiliateCtaClick('product_details_description')}
+                className="inline-flex items-center bg-stone-900 text-white px-5 py-2.5 rounded-lg text-xs uppercase tracking-[0.18em]"
+                style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+              >
+                Join Affiliate Program
+              </a>
             </div>
           </div>
 

@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { authApi, getStoredAccessToken, type AuthUser } from '../services/wpAuth';
+import { getStoredAffiliateRef, trackAffiliateEvent } from '../services/affiliate';
 
 interface AuthCtx {
   user: AuthUser | null;
@@ -41,6 +42,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { user, accessToken } = await authApi.register(input);
     setUser(user);
     setAccessToken(accessToken ?? null);
+    const ref = getStoredAffiliateRef();
+    if (ref) {
+      trackAffiliateEvent('affiliate_tier2_signup_attributed', { userId: user.id, ref });
+    }
   }, []);
 
   const logout = useCallback(async () => {
