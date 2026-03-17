@@ -280,6 +280,21 @@ final class EPR_Product_Requests_Plugin {
         );
     }
 
+    private function notify_admins_in_app($notification_type, $title, $message, $action_url, $metadata = array(), $priority = 'normal') {
+        if (!class_exists('ADA_Notifications')) {
+            return;
+        }
+
+        ADA_Notifications::notify_admins(
+            $notification_type,
+            $title,
+            $message,
+            $action_url,
+            $metadata,
+            $priority
+        );
+    }
+
     public function create_product_request(WP_REST_Request $request) {
         $rate = $this->enforce_rate_limit();
         if (is_wp_error($rate)) {
@@ -334,6 +349,15 @@ final class EPR_Product_Requests_Plugin {
         if ($attachment_id) {
             update_post_meta($post_id, 'attachment_id', (int) $attachment_id);
         }
+
+        $this->notify_admins_in_app(
+            'product_request',
+            'New Product Request',
+            sprintf('%s requested: %s', $name, $title),
+            '/admin?view=product-requests&id=' . (int) $post_id,
+            array('request_id' => (int) $post_id, 'email' => $email),
+            'high'
+        );
 
         return new WP_REST_Response($this->map_request_post($post_id), 201);
     }
@@ -402,6 +426,9 @@ final class EPR_Product_Requests_Plugin {
             return new WP_Error('not_found', 'Product request not found.', array('status' => 404));
         }
 
+        $previous_status = get_post_meta($id, 'status', true);
+        $previous_response = get_post_meta($id, 'admin_response', true);
+
         $allowed_status = array('pending', 'sourcing', 'closed');
         $status = sanitize_text_field((string) $request->get_param('status'));
         $admin_response = sanitize_textarea_field((string) $request->get_param('admin_response'));
@@ -416,6 +443,53 @@ final class EPR_Product_Requests_Plugin {
 
         if ($admin_response !== '') {
             update_post_meta($id, 'admin_response', $admin_response);
+        }
+
+        $current_status = $status !== '' ? $status : $previous_status;
+        $status_changed = $status !== '' && $status !== $previous_status;
+        $response_changed = $admin_response !== '' && $admin_response !== $previous_response;
+
+        if ($status_changed || $response_changed) {
+            $recipient = get_post_meta($id, 'email', true);
+            if (is_email($recipient)) {
+                $name = get_post_meta($id, 'name', true);
+                $product_title = get_post_meta($id, 'product_title', true);
+                $site_name = wp_specialchars_decode(get_bloginfo('name'), ENT_QUOTES);
+
+                $subject_parts = array();
+                if (!empty($product_title)) {
+                    $subject_parts[] = $product_title;
+                }
+                $subject_parts[] = 'Product Request Update';
+                $subject = sprintf('[%s] %s', $site_name, implode(' - ', $subject_parts));
+
+                $lines = array();
+                if (!empty($name)) {
+                    $lines[] = sprintf('Hi %s,', $name);
+                    $lines[] = '';
+                }
+
+                if ($status_changed) {
+                    $lines[] = sprintf('Your request status is now: %s', $current_status ?: 'pending');
+                    $lines[] = '';
+                }
+
+                if ($response_changed) {
+                    $lines[] = 'Message from our team:';
+                    $lines[] = wpautop(wp_kses_post($admin_response));
+                    $lines[] = '';
+                }
+
+                $lines[] = 'Thank you for reaching out to us.';
+                $message = implode("\n", $lines);
+
+                wp_mail(
+                    $recipient,
+                    $subject,
+                    $message,
+                    array('Content-Type: text/html; charset=UTF-8')
+                );
+            }
         }
 
         return new WP_REST_Response($this->map_request_post($id), 200);
@@ -471,6 +545,15 @@ final class EPR_Product_Requests_Plugin {
         update_post_meta($post_id, 'subject', $subject);
         update_post_meta($post_id, 'message', $message);
         update_post_meta($post_id, 'status', 'new');
+
+        $this->notify_admins_in_app(
+            'contact_submission',
+            'New Contact Submission',
+            sprintf('%s sent: %s', $name, $subject),
+            '/admin?view=contact-submissions&id=' . (int) $post_id,
+            array('submission_id' => (int) $post_id, 'email' => $email),
+            'normal'
+        );
 
         $this->contact_debug_log('create_success', array('id' => (int) $post_id));
         return new WP_REST_Response($this->map_contact_post($post_id), 201);
